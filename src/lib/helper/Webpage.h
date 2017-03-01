@@ -20,7 +20,9 @@ class Webpage
                            const unsigned retry_times = 2,
                            const unsigned retry_sleep_second = 4,
                            const string& user_agent = "Mozilla/5.0 (X11; Linux i686; rv:30.0) Gecko/20100101 Firefox/30.0",
-                           const string& cookie = "" );
+                           const string& post_cookies = "",
+                           const vector<pair<string, string>>& post_sections_list = vector<pair<string, string>>(),
+                           bool b_redirct = true );
         virtual ~Webpage ();
         
         string getProxyAddr (void) const;
@@ -55,6 +57,8 @@ class Webpage
                             const unsigned timeout_second = 0,
                             const unsigned retry_times = 4,
                             const unsigned retry_sleep_second = 4 );
+        
+        bool setMultiPostSectionsList (const vector<pair<string, string>>& post_sections_list);
         bool submitMultiPost ( const string& url,
                                const string& filename,
                                const vector<pair<string, string>>& post_sections_list,
@@ -63,7 +67,8 @@ class Webpage
                                const unsigned retry_sleep_second = 4 );
         
         string escapeUrl (const string& raw_url) const;
-        string unescapeHtml (const string& raw_txt) const;
+        
+        const vector<string>& getCookies (void) const;
 
     private:
         bool download_ ( const string& raw_url,
@@ -93,5 +98,10 @@ class Webpage
         long latest_http_status_code_;
         double aver_speed_download_;
         const string user_agent_;
+        vector<string> cookie_items_list_;
 };
+
+
+string convertUnicodeTxtToUtf8 (const string& unicode_txt);
+string unescapeHtml (const string& raw_txt);
 

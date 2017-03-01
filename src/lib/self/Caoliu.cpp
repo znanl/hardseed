@@ -19,11 +19,10 @@ using namespace std;
 
 static mutex g_mtx;
 
-static const string&
-getPortalWebpageUrl (void) 
+const string&
+Caoliu::getPortalWebpageUrl (void) const
 {
-    static const string portal_url("http://wo.yao.cl/");
-    return(portal_url);
+    return(portal_url_);
 }
 
 static const string&
@@ -67,9 +66,9 @@ getTopicsListWebpagePartUrl (Caoliu::AvClass av_class)
 }
 
 static const string
-getTopicsListWebpageUrl (Caoliu::AvClass av_class) 
+getTopicsListWebpageUrl (const string& portal_url, Caoliu::AvClass av_class) 
 {
-    return(getPortalWebpageUrl() + getTopicsListWebpagePartUrl(av_class));
+    return(portal_url + getTopicsListWebpagePartUrl(av_class));
 }
 
 static bool
@@ -89,6 +88,7 @@ isThereInList ( const string& webpage_title,
 
 static bool
 parseValidTopicsUrls ( Caoliu::AvClass av_class,
+                       const string& portal_url, 
                        const string& proxy_addr,
                        unsigned range_begin, unsigned range_end,
                        const vector<string>& hate_keywords_list,
@@ -98,11 +98,11 @@ parseValidTopicsUrls ( Caoliu::AvClass av_class,
 {
     valid_topics_urls_list.clear();
 
-    string current_url = getTopicsListWebpageUrl(av_class);
+    string current_url = getTopicsListWebpageUrl(portal_url, av_class);
     bool b_stop = false;
     unsigned topics_cnt = 0;
     while (!current_url.empty() && !b_stop) {
-        CaoliuTopicsListWebpage caoliu_topicslist_webpage(current_url, proxy_addr);
+        CaoliuTopicsListWebpage caoliu_topicslist_webpage(portal_url, current_url, proxy_addr);
         if (!caoliu_topicslist_webpage.isLoaded()) {
             return(false);
         }
@@ -280,7 +280,8 @@ getNextProxyAddr (const vector<string>& proxy_addrs_list)
     return(proxy_addrs_list[current_pos++]);
 }
 
-Caoliu::Caoliu ( AvClass av_class,
+Caoliu::Caoliu ( const string& portal_url,
+                 AvClass av_class,
                  const vector<string>& proxy_addrs_list,
                  unsigned range_begin, unsigned range_end,
                  const vector<string>& hate_keywords_list,
@@ -288,11 +289,13 @@ Caoliu::Caoliu ( AvClass av_class,
                  unsigned threads_total,
                  unsigned timeout_download_pic,
                  const string& path )
+    : portal_url_(portal_url)
 {
     // parse the URLs of valid topics by: range, hate keywords, like keywords
     cout << "Parse the URLs of topics from " << range_begin << " to " << range_end << ": " << flush;
     vector<string> valid_topics_urls_list;
     parseValidTopicsUrls( av_class,
+                          portal_url,
                           getNextProxyAddr(proxy_addrs_list),
                           range_begin, range_end,
                           hate_keywords_list,

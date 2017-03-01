@@ -8,15 +8,10 @@
 using namespace std;
 
 
-static const string&
-getPortalWebpageUrl (void) 
-{
-    static const string portal_url("http://wo.yao.cl/");
-    return(portal_url);
-}
 
 static bool
 parseTitlesAndUrls ( const string& webpage_txt,
+                     const string& portal_url,
                      vector<pair<string, string>>& titles_and_urls_list ) 
 {
     const unsigned size_back = titles_and_urls_list.size();
@@ -40,7 +35,7 @@ parseTitlesAndUrls ( const string& webpage_txt,
         if (topic_url_part.empty()) {
             break;
         }
-        const string& topic_url = getPortalWebpageUrl() + keyword_topic_url_begin2 + topic_url_part;
+        const string& topic_url = portal_url  + keyword_topic_url_begin2 + topic_url_part;
         keyword_topic_url_end_pos = pair_url.second;
         
         // parse topic title
@@ -61,7 +56,7 @@ parseTitlesAndUrls ( const string& webpage_txt,
 }
 
 static bool
-parseNextpageUrl (const string& webpage_txt, string& nextpage_url) 
+parseNextpageUrl (const string& webpage_txt, const string& portal_url, string& nextpage_url) 
 {
     nextpage_url.empty();
 
@@ -71,7 +66,7 @@ parseNextpageUrl (const string& webpage_txt, string& nextpage_url)
         return(false);
     }
 
-    static const string keyword_href("href=\'");
+    static const string keyword_href("<a href=\"");
     const auto keyword_href_pos = webpage_txt.rfind(keyword_href, keyword_nextpage_pos);
     if (string::npos == keyword_href_pos) {
         cerr << "WARNING! parseNextpageUrl() cannot find the keyword " << keyword_href << ". " << endl;
@@ -79,21 +74,21 @@ parseNextpageUrl (const string& webpage_txt, string& nextpage_url)
     }
 
     const auto nextpage_suburl_begin_pos = keyword_href_pos + keyword_href.size();
-    const auto nextpage_suburl_end_pos = webpage_txt.find("'", nextpage_suburl_begin_pos);
+    const auto nextpage_suburl_end_pos = webpage_txt.find("\"", nextpage_suburl_begin_pos);
     if (string::npos == nextpage_suburl_end_pos) {
         cerr << "WARNING! parseNextpageUrl() cannot find the keyword '. " << endl;
         return(false);
     }
 
-    nextpage_url = getPortalWebpageUrl() +
+    nextpage_url = portal_url  +
                    webpage_txt.substr(nextpage_suburl_begin_pos, nextpage_suburl_end_pos - nextpage_suburl_begin_pos);
     
 
     return(true);
 }
 
-CaoliuTopicsListWebpage::CaoliuTopicsListWebpage (const string& url, const string& proxy_addr)
-    : TopicsListWebpage(url, parseTitlesAndUrls, parseNextpageUrl, proxy_addr, "gbk", "UTF-8")
+CaoliuTopicsListWebpage::CaoliuTopicsListWebpage (const string& portal_url, const string& url, const string& proxy_addr)
+    : TopicsListWebpage(portal_url, url, parseTitlesAndUrls, parseNextpageUrl, proxy_addr, "gbk", "UTF-8")
 {
     ;
 }

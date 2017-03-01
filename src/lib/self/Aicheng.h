@@ -15,7 +15,8 @@ class Aicheng
         enum AvClass {west, cartoon, asia_mosaicked, asia_non_mosaicked};
 
     public:
-        Aicheng ( AvClass av_class,
+        Aicheng ( const string& portal_url,
+                  AvClass av_class,
                   const vector<string>& proxy_addrs_list,
                   unsigned range_begin, unsigned range_end,
                   const vector<string>& hate_keywords_list,
@@ -24,5 +25,11 @@ class Aicheng
                   unsigned timeout_download_pic,
                   const string& path );
         virtual ~Aicheng ();
+        
+        const string& getPortalWebpageUrl (void) const;
+
+
+    private:
+        const string portal_url_;
 };
 

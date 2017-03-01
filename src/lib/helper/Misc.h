@@ -48,3 +48,14 @@ getFileSize (FILE* fs);
 // get random filename, include path
 string
 makeRandomFilename (void);
+
+// unicode 转 UTF8
+pair<size_t, unsigned long long>
+convertUnicodeToUtf8 (unsigned int unicode);
+
+// fork() 启动新进程后立即返回，而本函数将等待新进程执行完毕后再返回
+bool
+wait_cmd ( const string& cmd,
+           const vector<string>& argv,
+           int* p_exitCode = nullptr,
+           bool b_echo = false ); 

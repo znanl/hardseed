@@ -9,33 +9,17 @@
 using namespace std;
 
 
-static const string&
-getPortalWebpageUrl (void) 
-{
-    static const string portal_url("http://www.ac168.info");
-    return(portal_url);
-}
 
 static bool
 parseTitlesAndUrls ( const string& webpage_txt,
+                     const string& portal_url,
                      vector<pair<string, string>>& titles_and_urls_list ) 
 {
     const unsigned size_back = titles_and_urls_list.size();
 
-    size_t keyword_topic_url_begin_pos = 0, keyword_topic_url_end_pos = 0;
-    static const vector<string> rule_topic_keywords_list = { "防止盗号", "版规", "求 片 區" }; // "防止盗号" must be the first, because
-                                                                                               // "版规" and "防止盗号" successively appear
-                                                                                               // in the same topics list webpage
-                                                                                               // http://www.ac168.info/bt/simple/index.php?f16.html
-    for (const auto& e : rule_topic_keywords_list) {
-        keyword_topic_url_begin_pos = webpage_txt.find(e);
-        if (string::npos != keyword_topic_url_begin_pos) {
-            break;
-        }
-    }
-    if (string::npos == keyword_topic_url_begin_pos) {
-        keyword_topic_url_begin_pos = 0;
-    }
+    const auto topics_list_txt_pos = webpage_txt.find(R"(style="border-top:0">普通主题</td></tr>)");
+    size_t keyword_topic_url_begin_pos = ((string::npos == topics_list_txt_pos) ? 0 : topics_list_txt_pos);
+    size_t keyword_topic_url_end_pos = 0;
 
     while (true) {
         // parse topic URL
@@ -49,7 +33,7 @@ parseTitlesAndUrls ( const string& webpage_txt,
         if (topic_url_part.empty()) {
             break;
         }
-        const string topic_url = getPortalWebpageUrl() + "/bt/" + topic_url_part;
+        const string topic_url = portal_url + topic_url_part;
         keyword_topic_url_end_pos = pair_url.second;
         
         // parse topic title
@@ -71,7 +55,7 @@ parseTitlesAndUrls ( const string& webpage_txt,
 }
 
 static bool
-parseNextpageUrl (const string& webpage_txt, string& nextpage_url) 
+parseNextpageUrl (const string& webpage_txt, const string& portal_url, string& nextpage_url) 
 {
     nextpage_url.empty();
 
@@ -84,13 +68,14 @@ parseNextpageUrl (const string& webpage_txt, string& nextpage_url)
         return(false);
     }
 
-    nextpage_url = getPortalWebpageUrl() + nextpage_url_part;
+    // portal_url 中多了 "/bt"
+    nextpage_url = string(portal_url.cbegin(), portal_url.cend() - (const int)string("/bt").length()) + nextpage_url_part;
     
     return(true);
 }
 
-AichengTopicsListWebpage::AichengTopicsListWebpage (const string& url, const string& proxy_addr)
-    : TopicsListWebpage(url, parseTitlesAndUrls, parseNextpageUrl, proxy_addr, "gbk", "UTF-8")
+AichengTopicsListWebpage::AichengTopicsListWebpage (const string& portal_url, const string& url, const string& proxy_addr)
+    : TopicsListWebpage(portal_url, url, parseTitlesAndUrls, parseNextpageUrl, proxy_addr, "gbk", "UTF-8")
 {
     ;
 }

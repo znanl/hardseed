@@ -13,6 +13,6 @@ using std::vector;
 class CaoliuTopicsListWebpage : public TopicsListWebpage
 {
     public:
-        CaoliuTopicsListWebpage (const string& url, const string& proxy_addr);
+        CaoliuTopicsListWebpage (const string& portal_url, const string& url, const string& proxy_addr);
         virtual ~CaoliuTopicsListWebpage ();
 };

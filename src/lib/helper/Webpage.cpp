@@ -54,12 +54,6 @@ initLibcurl (const char* libcurl_err_info_buff)
         exit(EXIT_FAILURE);
     }
 
-    // follow the URL redirect
-    checkErrLibcurl(curl_easy_setopt(p_curl, CURLOPT_FOLLOWLOCATION, true), libcurl_err_info_buff);
-
-    // to allow multi-threaded unix applications to still set/use all timeout options etc, without risking getting signals
-    checkErrLibcurl(curl_easy_setopt(p_curl, CURLOPT_NOSIGNAL, true), libcurl_err_info_buff);
-
     // automatically set the Referer to redirect source
     checkErrLibcurl(curl_easy_setopt(p_curl, CURLOPT_AUTOREFERER, true), libcurl_err_info_buff);
 
@@ -209,43 +203,6 @@ Webpage::escapeUrl (const string& raw_url) const
 }
 
 string
-Webpage::unescapeHtml (const string& raw_txt) const
-{
-    string unescaped_html_str = raw_txt;
-
-    // more see http://www.theukwebdesigncompany.com/articles/entity-escape-characters.php
-    static const vector<pair<string, string>> escaped_html_chars_list = { make_pair("&apos;", "'"),
-                                                                          make_pair("&quot;", "\""),
-                                                                          make_pair("&amp;", "&"),
-                                                                          make_pair("&lt;", "<"),
-                                                                          make_pair("&gt;", ">"),
-                                                                          make_pair("&nbsp;", " "),
-                                                                          make_pair("&#160;", " "),
-                                                                          make_pair("&#12539;", "・"),
-                                                                          make_pair("&#9711;", "◯"),
-                                                                          make_pair("&#9834;", "♪"),
-                                                                          make_pair("&#39;", "'") };
-
-    bool b_find;
-    size_t pos = 0;
-    do {
-        b_find = false;
-        for (const auto& e : escaped_html_chars_list) {
-            pos = 0;
-            const string& escaped_str = e.first, unescaped_str = e.second;
-            pos = unescaped_html_str.find(escaped_str, pos);
-            if (string::npos != pos) {
-                unescaped_html_str.replace(pos, escaped_str.size(), unescaped_str);
-                b_find = true;
-                break;
-            }
-        }
-    } while (b_find);
-
-    return(unescaped_html_str);
-}
-
-string
 Webpage::requestHttpHeader_ ( const string& raw_url,
                               HttpHeader_ header_item,
                               const unsigned timeout_second,
@@ -381,6 +338,12 @@ Webpage::getRemoteFiletime (const string& url) const
 // notes:
 // 0) no https
 // 1) List of User Agent Strings, see http://www.useragentstring.com/pages/useragentstring.php
+// 2) post_cookies 可包含多个 cookie 项，如：
+// .baidu.com	TRUE	/	FALSE	1461859872	BAIDUID	7CDCF85BC9A130D867AD3016C3994D96:FG=1
+// .wappass.baidu.com	TRUE	/	FALSE	1689523774	PTOKEN	6d7057ded7970d292eb54027762b6d7a
+// 则应合并为：
+// ".baidu.com	TRUE	/	FALSE	1461859872	BAIDUID	7CDCF85BC9A130D867AD3016C3994D96:FG=1\n
+// .wappass.baidu.com	TRUE	/	FALSE	1689523774	PTOKEN	6d7057ded7970d292eb54027762b6d7a"
 Webpage::Webpage ( const string& url,
                    const string& filename,
                    const string& proxy_addr,
@@ -388,7 +351,9 @@ Webpage::Webpage ( const string& url,
                    const unsigned retry_times,
                    const unsigned retry_sleep_second,
                    const string& user_agent,
-                   const string& cookie )
+                   const string& post_cookies,
+                   const vector<pair<string, string>>& post_sections_list,
+                   bool b_redirct )
     : p_curl_(initLibcurl(libcurl_err_info_buff_)),
       url_(url),
       proxy_addr_(proxy_addr),
@@ -404,9 +369,19 @@ Webpage::Webpage ( const string& url,
     // if proxy_addr is "", disable proxy
     checkErrLibcurl(curl_easy_setopt(p_curl_, CURLOPT_PROXY, proxy_addr_.c_str()), libcurl_err_info_buff_);
 
-    if (!cookie.empty()) {
-        checkErrLibcurl(curl_easy_setopt(p_curl_, CURLOPT_COOKIEFILE, ""), libcurl_err_info_buff_); // enable the cookie engine
-        checkErrLibcurl(curl_easy_setopt(p_curl_, CURLOPT_COOKIE, cookie.c_str()), libcurl_err_info_buff_); // set the cookie
+    // follow the URL redirect
+    checkErrLibcurl(curl_easy_setopt(p_curl_, CURLOPT_FOLLOWLOCATION, b_redirct), libcurl_err_info_buff_);
+
+    // cookies
+    checkErrLibcurl(curl_easy_setopt(p_curl_, CURLOPT_COOKIEFILE, ""), libcurl_err_info_buff_); // enable the cookie engine
+    if (!post_cookies.empty()) {
+        checkErrLibcurl(curl_easy_setopt(p_curl_, CURLOPT_COOKIE, post_cookies.c_str()), libcurl_err_info_buff_); // set the cookie
+        if (!post_sections_list.empty()) {
+            if (!setMultiPostSectionsList(post_sections_list)) { // set multi post sections
+                cerr << "ERROR! fail to set multi post sections. " << endl;
+                exit(EXIT_FAILURE);
+            }
+        }
     }
 
     // pretend as browser
@@ -415,10 +390,11 @@ Webpage::Webpage ( const string& url,
                          libcurl_err_info_buff_ );
     }
 
-    // don't download none-webpage file when construct the obj 
-    if ("text/html" != getRemoteFiletype(url_)) {
-        return;
-    }
+    //// don't download none-webpage file when construct the obj 
+    //const string& remote_filetype = getRemoteFiletype(url_);
+    //if ("text/html" != remote_filetype && "text/javascript" != remote_filetype) {
+        //return;
+    //}
 
     // download webpage to local file
     const string& localfile = (filename.empty() ? makeRandomFilename() : filename);
@@ -429,6 +405,16 @@ Webpage::Webpage ( const string& url,
         }
         return;
     }
+
+    // 保存获取的 cookies
+    struct curl_slist* p_cookies = nullptr;
+    checkErrLibcurl(curl_easy_getinfo(p_curl_, CURLINFO_COOKIELIST, &p_cookies), libcurl_err_info_buff_); // enable the cookie engine
+    struct curl_slist* p_cookies_old = p_cookies;;
+    while (p_cookies) {
+        cookie_items_list_.push_back(p_cookies->data);
+        p_cookies = p_cookies->next;
+    }
+    curl_slist_free_all(p_cookies_old);
 
     // read webpage file into string
     ifstream ifs(localfile);
@@ -545,7 +531,7 @@ Webpage::download_ ( const string& raw_url,
     // ready for downloading webpage to locale tmp file
     FILE* fs = fopen(filename.c_str(), "w+");
     if (nullptr == fs) {
-        cerr << "ERROR! Webpage::download() something happened. Fail to open file " << filename << endl;
+        cerr << "ERROR! Webpage::download_() something happened. Fail to open file " << filename << endl;
         return(false);
     }
     checkErrLibcurl(curl_easy_setopt(p_curl_, CURLOPT_WRITEDATA, fs), libcurl_err_info_buff_);
@@ -592,16 +578,10 @@ Webpage::download_ ( const string& raw_url,
     return(b_downloaded);
 }
 
+// construct the all sections for multipart/formdata style HTTP post
 bool
-Webpage::submitMultiPost ( const string& url,
-                           const string& filename,
-                           const vector<pair<string, string>>& post_sections_list,
-                           const unsigned timeout_second,
-                           const unsigned retry_times,
-                           const unsigned retry_sleep_second)
+Webpage::setMultiPostSectionsList (const vector<pair<string, string>>& post_sections_list)
 {
-    // construct the all sections for multipart/formdata style HTTP post
-    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     struct curl_httppost* p_first_section = nullptr;
     struct curl_httppost* p_last_section = nullptr;
 
@@ -613,16 +593,30 @@ Webpage::submitMultiPost ( const string& url,
                           CURLFORM_PTRNAME, name.c_str(),
                           CURLFORM_PTRCONTENTS, content.c_str(),
                           CURLFORM_END )) {
-            //cerr << "ERROR! RmdownSeedDownloadWebpage::downloadSeed() call curl_formadd() failure! " << endl;
             return(false);
         }
     }
 
     if (!checkErrLibcurl(curl_easy_setopt(p_curl_, CURLOPT_HTTPPOST, p_first_section), libcurl_err_info_buff_)) {
-        //cerr << "ERROR! RmdownSeedDownloadWebpage::downloadSeed() call curl_easy_setopt() failure! " << endl;
         return(false);
     }
-    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+    return(true);
+}
+
+
+bool
+Webpage::submitMultiPost ( const string& url,
+                           const string& filename,
+                           const vector<pair<string, string>>& post_sections_list,
+                           const unsigned timeout_second,
+                           const unsigned retry_times,
+                           const unsigned retry_sleep_second )
+{
+    if (!setMultiPostSectionsList(post_sections_list)) {
+        return(false);
+    }
 
     bool b_success = download_(url, filename, url_, timeout_second, retry_times, retry_sleep_second);
 
@@ -705,6 +699,113 @@ const string&
 Webpage::getTitle (void) const
 {
     return(title_);
+}
+
+string
+convertUnicodeTxtToUtf8 (const string& unicode_txt)
+{
+    string utf8_txt(unicode_txt);
+
+    size_t unicode_prefix_pos = 0;
+    while (true) {
+        static const string unicode_prefix("\\u"); // \u
+        
+        // 查找 \u
+        unicode_prefix_pos = utf8_txt.find(unicode_prefix, unicode_prefix_pos);
+        if (string::npos == unicode_prefix_pos) {
+            break;
+        }
+        
+        // 找到的 \u 后至少得有 4 个字符
+        if (unicode_prefix_pos + unicode_prefix.length() + 4 >= utf8_txt.length()) {
+            cerr << "WARNING! the end unicode incomplete. " << endl;
+            break;
+        }
+        
+        // 提取字符串形式的 unicode
+        const string unicode_str = utf8_txt.substr(unicode_prefix_pos + unicode_prefix.length(), 4);
+        
+        // 将字符串形式 unicode 转换为对应数值
+        istringstream iss(unicode_str);
+        unsigned unicode_hex;
+        if (!(iss >> std::hex >> unicode_hex)) {
+            cerr << "WARNING! " << unicode_str << " is not a vaild unicode. " << endl;
+            break;
+        }
+        
+        // 将数值的 unicode 转换为数值的 UTF8
+        const pair<size_t, unsigned long long> utf8_pair = convertUnicodeToUtf8(unicode_hex);
+        const size_t utf8_size = utf8_pair.first;
+        const unsigned long long utf8 = utf8_pair.second;
+        
+        // 将数值的 UTF8 转换为多字节字符串
+        char utf8_str[8] = {'\0'};
+        for (unsigned i = 0; i < utf8_size; ++i) {
+            utf8_str[utf8_size - 1 - i] = char(utf8 >> (i * 8));
+        }
+        
+        // 用 UTF8 多字节字符串替换对应 \u 开头的 unicode 字符串
+        utf8_txt.replace(unicode_prefix_pos, unicode_prefix.length() + 4, utf8_str);
+    }
+
+
+    return(utf8_txt);
+}
+
+string
+unescapeHtml (const string& raw_txt)
+{
+    string unescaped_html_str = raw_txt;
+
+    // more see http://www.theukwebdesigncompany.com/articles/entity-escape-characters.php
+    static const vector<pair<string, string>> escaped_html_chars_list = { make_pair("&apos;", "'"),
+                                                                          make_pair("&quot;", "\""),
+                                                                          make_pair("&rsquo;", "’"),
+                                                                          make_pair("&amp;", "&"),
+                                                                          make_pair("&acute;", "´"),
+                                                                          make_pair("&lt;", "<"),
+                                                                          make_pair("&middot;", "·"),
+                                                                          make_pair("&gt;", ">"),
+                                                                          make_pair("&nbsp;", " "),
+                                                                          make_pair("&#160;", " "),
+                                                                          make_pair("&#12539;", "・"),
+                                                                          make_pair("&#9711;", "◯"),
+                                                                          make_pair("&mdash;", "—"),
+                                                                          make_pair("&ldquo;", "“"),
+                                                                          make_pair("&rdquo;", "”"),
+                                                                          make_pair("&#9834;", "♪"),
+                                                                          make_pair("&radic;", "√"),
+                                                                          make_pair("&#8730;", "√"),
+                                                                          make_pair("&infin;", "∞"),
+                                                                          make_pair("&#8734;", "∞"),
+                                                                          make_pair("&hellip;", "…"),
+                                                                          make_pair("&#133;", "…"),
+                                                                          make_pair("&#039;", "'"),
+                                                                          make_pair("&#39;", "'") };
+
+    bool b_find;
+    size_t pos = 0;
+    do {
+        b_find = false;
+        for (const auto& e : escaped_html_chars_list) {
+            pos = 0;
+            const string& escaped_str = e.first, unescaped_str = e.second;
+            pos = unescaped_html_str.find(escaped_str, pos);
+            if (string::npos != pos) {
+                unescaped_html_str.replace(pos, escaped_str.size(), unescaped_str);
+                b_find = true;
+                break;
+            }
+        }
+    } while (b_find);
+
+    return(unescaped_html_str);
+}
+
+const vector<string>& 
+Webpage::getCookies (void) const
+{
+    return(cookie_items_list_);
 }
 
 

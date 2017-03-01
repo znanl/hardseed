@@ -1,17 +1,18 @@
-#给不了你梦中情人，至少还有硬盘女神：hardseed
+<h1 align="center">给不了你梦中情人，至少还有硬盘女神：hardseed</h1>
 yangyangwithgnu@yeah.net  
 http://yangyangwithgnu.github.io/  
-2015-03-22 00:23:16
+2016-02-04 14:53:51
 
 
 ##谢谢
 
-**捐赠：支付宝 yangyangwithgnu@yeah.net 。支付宝链接 https://shenghuo.alipay.com/send/payment/fill.htm?optEmail=yangyangwithgnu@yeah.net ，支付宝二维码 $_$**
+**捐赠：支付宝 yangyangwithgnu@yeah.net ，支付宝二维码（左），微信二维码（右）**
 <div align="center">
-<img src="https://raw.githubusercontent.com/yangyangwithgnu/yangyangwithgnu.github.io/master/pics/donate_qr.png" alt=""/><br>
+<img src="https://raw.githubusercontent.com/yangyangwithgnu/yangyangwithgnu.github.io/master/pics/alipay_donate_qr.png" alt=""/>
+<img src="https://raw.githubusercontent.com/yangyangwithgnu/yangyangwithgnu.github.io/master/pics/wechat_donate_qr.png" alt=""/><br>
 </div>
 
-**二手书**：书，我提高开发技能的重要手段之一，随着职业生涯的发展，书籍也在不断增多，对我而言，一本书最多读三遍，再往后，几乎没有什么营养吸收，这部分书对我已基本无用，但对其他人可能仍有价值，所以，为合理利用资源，我决定低价出售这些书，希望达到两个目的：0）用售出的钱购买更多新书（没当过雷锋的朋友 (๑´ڡ`๑)）；1）你低价购得需要的书（虽然二手）。到 http://yangyangwithgnu.ecvps.net/used_books/used_books.htm 看看有无你钟意的。
+**二手书**：书，我提高开发技能的重要手段之一，随着职业生涯的发展，书籍也在不断增多，对我而言，一本书最多读三遍，再往后，几乎没有什么营养吸收，这部分书对我已基本无用，但对其他人可能仍有价值，所以，为合理利用资源，我决定低价出售这些书，希望达到两个目的：0）用售出的钱购买更多新书（没当过雷锋的朋友 (๑´ڡ`๑)）；1）你低价购得需要的书（虽然二手）。到 https://github.com/yangyangwithgnu/used_books 看看有无你钟意的。
 
 
 ##公告
@@ -23,12 +24,15 @@ http://yangyangwithgnu.github.io/
 
 **注意**  
 + 代理是一切的先决条件。你可以使用自己的代理工具，用 hardseed 的命令行选项 --proxy 指定本地中转地址及端口，也可以用我为你预配置的 goagent 代理工具，位于 https://github.com/yangyangwithgnu/goagent_out_of_box_yang
-+ windows 用户需赋予 hardseed\bin\windows\hardseed.exe 管理员运行权限。具体请右键，选中 properties - compatibility - privilege level - run this program as an admin
 
 
 ##版本
 ----------------
 
+**[v0.2.14-1，修正，2016-02-04]**：0）行了、行了，我抱歉，不知道有这么多 win 用户需要 hardseed，之前是我狭隘了，只考虑到 unix-like 用户。编译好的 win 版本程序送你，位于 bin\build_4_win.7z；1）另外，osX 下的构建方面进行了细化。新年快乐！  
+**[v0.2.14，修正，2016-01-31]**：0）忽略解析 aicheng 站务相关帖子。  
+**[v0.2.13，修正，2016-01-17]**：0）修正 caoliu 翻页的错误。  
+**[v0.2.12，优化，2015-05-26]**：0）先前 hardseed 中硬编码 aicheng 和 caoliu 论坛入口地址，地址一旦变更，每次需要重新调整代码，很是麻烦，现在我在本项目主页中放了一份配置文件 config/portals_list.json，hardseed 自动从该文件中获取最新论坛入口地址（安啦，我会及时更新的）；1）调整部分公共库代码。  
 **[v0.2.11，修正，2015-03-22]**：修正 aicheng 种子和图片解析错误的问题（别发邮件了哈，亲，邮箱都他妈快撑爆了） 。  
 **[v0.2.10，修正，2014-12-07]**：caoliu 地址变更，shit :-P  
 **[v0.2.09，修正，2014-11-30]**：caoliu 地址变更。  
@@ -139,7 +143,7 @@ That's all. Any suggestions let me know by yangyangwithgnu@yeah.net or http://ya
 ##中文
 --------
 
-硬盘女神，你懂嘀！hardseed 是个种子下载工具，它从浓（ai）情（cheng）蜜（she）意（qu）和爱（cao）意（liu）无（she）限（qu）的地方获取女神种子、图片。  
+hardseed 希望带给你（硬盘）女神！女神的种子和图片。  
 
 ###【翻墙】  
 你知道，这一切的一切都在墙外，所以你得具备翻墙环境，hardseed 才能帮你拉女神。hardseed 支持 goagent、shadowsocks、SSH、VPN （PPTP 和 openVPN）等各类代理模式，甚至你可以同时使用多种代理以极速下载。从普及度、稳定性、高效性来看，goagent 最优。“我一小白，平时工作压力本来就大，就想看看女神轻松下，你还让我折腾代理！没人性！”，嘚，亲，咱是做服务的。我帮你配置了一份开箱即用的 goagent，位于 https://github.com/yangyangwithgnu/goagent_out_of_box_yang ，下载后，linux 用户，命令行中运行
@@ -161,7 +165,7 @@ $ git clone https://github.com/yangyangwithgnu/hardseed.git
 ###【源码安装】
 
 ####『windows』  
-这基本没 windows 用户什么事儿，除非你有 cygwin，否则你没法编译源码，没事，帮你弄好了，我的定位是牙医界的服务人员，服务很重要，二进制执行程序位于 hardseed\bin\windows\hardseed.exe。
+这基本没 windows 用户什么事儿，除非你有 cygwin，否则你没法编译源码，没事，帮你弄好了，我的定位是牙医界的服务人员，服务很重要，二进制执行程序位于 hardseed\bin\build_4_win.7z。
  
 ####『linux』
 0）唯一依赖 libcurl，请自行安装；  
@@ -174,7 +178,7 @@ $ make && make install
 ```
  
 ####『osX』
-先将 build/CMakeLists.txt 中的  
+首先，将 build/CMakeLists.txt 中的  
 ```
 TARGET_LINK_LIBRARIES(hardseed curl pthread)
 ```
@@ -182,7 +186,34 @@ TARGET_LINK_LIBRARIES(hardseed curl pthread)
 ```
 TARGET_LINK_LIBRARIES(hardseed curl pthread iconv)
 ```
-其他同 linux 构建方法。
+
+然后，将 build/CMakeLists.txt 中
+```
+## osX
+##>>>>>>>>>>>>>>>>>>>>>>
+
+#SET(CMAKE_CXX_COMPILER "g++")
+#SET(CMAKE_CXX_FLAGS "-std=c++11 -O3")
+#SET(CMAKE_BUILD_TYPE release)
+#ADD_EXECUTABLE(hardseed ${SRC_LIST})
+#TARGET_LINK_LIBRARIES(hardseed curl pthread iconv)
+#INSTALL(PROGRAMS hardseed DESTINATION /usr/bin/)
+```
+第一列的 # 删除；
+
+接着，将 build/CMakeLists.txt 中
+```
+# release
+SET(CMAKE_CXX_COMPILER "g++")
+SET(CMAKE_CXX_FLAGS "-std=c++11 -O3")
+SET(CMAKE_BUILD_TYPE release)
+ADD_EXECUTABLE(hardseed ${SRC_LIST})
+TARGET_LINK_LIBRARIES(hardseed curl pthread)
+INSTALL(PROGRAMS hardseed DESTINATION /usr/bin/)
+```
+删掉；
+
+最后，剩下步骤同 linux 构建方法。
 
 
 
@@ -190,7 +221,7 @@ TARGET_LINK_LIBRARIES(hardseed curl pthread iconv)
 **亲，听好了，运行 hardseed 前务必确保代理程序已正常运行，否则，别说女神，蚊子都碰不到。**
 
 ####『windows』  
-先进入 hardseed\bin\windows\，找到并选中 hardseed.exe，右键设置**以管理员权限运行该程序**，接着键入 alt-d 将光标定位到文件管理器的地址栏中，键入 CMD 启动命令行窗口，再在 CMD 中键入
+先进入 hardseed\bin\，解压 build_4_win.7z，选中 hardseed.exe，右键设置**以管理员权限运行该程序**，接着键入 alt-d 将光标定位到文件管理器的地址栏中，键入 CMD 启动命令行窗口，在 CMD 中键入
 ```
 X:\hardseed\bin\windows> hardseed.exe
 ```
@@ -209,7 +240,7 @@ $ hardseed --saveas-path ~/downloads --topics-range 256 --av-class aicheng_west
 
 ###【FQA】  
 
-**Q1**：为何 windows 版的可执行文件目录 hardseed\bin\windows\ 下有一堆 cyg\*.dll 文件？  
+**Q1**：为何 windows 版的可执行文件目录 build_4_win\ 下有一堆 cyg\*.dll 文件？  
 **A1**：hardseed 是用 C++ 编写的遵循 SUS（单一 unix 规范）的原生 linux 程序，理论上，在任何 unix-like（linux、BSD、osX） 系统上均可正常源码编译，唯独不支持 windows，为让 hardseed 具备跨平台能力，须借由某种工具（或环境）将 hardseed 转换成 windows 下的执行程序。cygwin 就是这种环境，我把 hardseed 源码纳入 cygwin 环境中重新编译，即可生成 windows 下的可执行程序 hardseed.exe，在这个过程中，cygwin 会加入些自己的代码和中转库到 hardseed.exe 中，cyg\*.dll 就是各类中转库。
 
 **Q2**：为何运行 windows 版的执行程序总有如下警告
@@ -234,7 +265,7 @@ Preferred POSIX equivalent is: /cygdrive/c/xxxx, CYGWIN environment variable opt
 **Q5**：如何加快下载速度？  
 **A5**：最直接会想到多线程下载，一条线程负责下载一个页面，逻辑上，线程数越多、下载速度越快，实际上，存在代理服务器和被访服务器两方面的限制：
 * 代理服务器方面的限制，代理服务器为不同用户提供代理服务，为避免相互影响，通常它会限制单个用户的流量和请求频率，所以，hardseed 在指定代理服务器上的线程数一定是有个上限；
-* 被访服务器方面到限制，你访问的论坛不会低能到不控制请求频率，举个例，正常情况你 4 秒钟可以打开 4 张 caoliu 论坛的帖子，一旦 caoliu 服务器发现你 1 秒钟打开了 32 张帖子那一定将此视为机器人行为，从而拒绝响应。
+* 被访服务器方面的限制，你访问的论坛不会低能到不控制请求频率，举个例，正常情况你 4 秒钟可以打开 4 张 caoliu 论坛的帖子，一旦 caoliu 服务器发现你 1 秒钟打开了 32 张帖子那一定将此视为机器人行为，从而拒绝响应。
 
 正由于存在代理服务器和被访服务器两方面的限制，线程数不能无限大，从我多次测试的经验来看，**单个代理服务器**访问被访服务器的并行线程数设定为 8 条最为稳定，否则容易引起代理服务器和被访服务器停服。同个时刻有大量用户在访问 caoliu 论坛，肯定远超 1 秒钟打开了 32 张帖子的频率，为何 caoliu 没对所有用户拒绝请求？显然，这些请求来自不同 IP 的电脑终端，按这个思路，如果 hardseed 若能通过多个不同 IP 访问 caoliu，对于代理服务器和被访服务器来说请求数量都变少了，那完全可以绕开 caoliu 对单个 IP 请求频率过快的限制。由于我们采用代理访问，发起访问请求的 IP 就是代理服务器的 IP，显然，只要 hardseed 支持同时使用多个代理服务器，那么一切问题就简单了。所以，我**赋予了 hardseed 多路代理的能力**。hardseed 支持 4 种代理模式：
 * goagent (STRONGLY recommended), --proxy http://127.0.0.1:8087
@@ -285,7 +316,10 @@ failure (download error from http://cl.man.lv/htm_data/2/1407/1174338.html. pict
 **A11**：两方面原因。一方面，合集均是把以往的单个帖子合并一起再发布，完全重复；一方面，虽然帖子中有多部不同片子的图片，但实际上帖子中的种子只是其中一部片子的，没有意义。
 
 **Q12**：很多片子迅雷报违规资源，下载速度奇慢，如何破？  
-**A12**：ThunderSuperSpeedHacker，无它。（《论逆向工程的重要性》，唉，当年多么痴迷 (°Д°)）
+**A12**：**第一**，尽可能下新片，道理很简单，越新的片子被举报违规的可能性越小，具体而言，你应该用 hardseed 抓取最新帖子的种子，并且尽可能及时下载；**第二**，借助第三方工具一定程度绕开迅雷对违规资源的限制，ThunderSuperSpeedHacker（《论逆向工程的重要性》，唉，当年多么痴迷 (°Д°)），前提你必须是迅雷会员，否则任何方法均无效。迅雷通过离线空间和高速通道两种途径为会员提速，一旦发现违规资源则关闭离线空间和高速通道两个途径，离线空间是否开启是在服务端控制，客户端的任何外力作用均无效，但是，高速通道是否开启则是在客户端控制，这就为第三方工具强制开启高速通道提供了环境，ThunderSuperSpeedHacker 可以做到。用法很简单，先退出迅雷相关进程（thunder.exe、thunderplatform.exe），再运行 ThunderSuperSpeedHacker 点击“破解”即可。那么，有了 ThunderSuperSpeedHacker 是否一定就能享受高速通道了么？不一定，ThunderSuperSpeedHacker 对迅雷版本敏感。对于迅雷 v7.9.37.4952 及后续版本，一旦 ThunderSuperSpeedHacker 介入将导致迅雷僵死。解决办法：  
+0）首先，下载老版本迅雷。有很多网站提供迅雷历史版本下载，不过，安全原则之一，尽可能从官网下载，所以，我只信任迅雷官网上的历史版本。在迅雷首页（http://www.kankan.com/ ）右上角有最新版迅雷下载地址，也就是说，要找到迅雷历史版本下载地址，只要找到迅雷官网首页某个历史快照即可，用时光机器（http://web.archive.org/web/ 墙外）很容易做到，比如，4 月 1 号的首页快照（http://web.archive.org/web/20150401032902/http://www.kankan.com/ ）对应版本 v7.9.34.4908，下载地址为 http://down.sandai.net/thunder7/Thunder_kk_7.9.34.4908Preview.exe ；  
+1）接着，防止自动升级。一旦运行迅雷，它将在后台自动强制升级至最新版，所以，你得暴力阻止其升级，删除升级相关程序（xlliveud.exe、liveudinstaller.exe、thunderliveupdate.xar）即可；  
+2）最后，使用 ThunderSuperSpeedHacker 破解违规资源高速通道限制即可。  
 
 **Q13**：hardseed 在 windows 环境下载的文件部分无法删除？  
 **A13**：hardseed 正在写文件时被 ctrl-c 强制退出，文件锁未被 cyg\*.dll 释放，而 cyg\*.dll 已加载至 CMD 进程空间，所以，请先关闭所有 CMD 窗口，尝试删除相关文件，若不行，请再开新 CMD 窗口后执行

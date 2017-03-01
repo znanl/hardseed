@@ -7,13 +7,15 @@
 using namespace std;
 
 
-TopicsListWebpage::TopicsListWebpage ( const string& url,
+TopicsListWebpage::TopicsListWebpage ( const string& portal_url,
+                                       const string& url,
                                        TopicsListWebpage::ParseTitlesAndUrls parseTitlesAndUrls,
                                        TopicsListWebpage::ParseNextpageUrl parseNextpageUrl,
                                        const string& proxy_addr,
                                        const string& src_charset,
                                        const string& dest_charset )
-    : Webpage(url, "", proxy_addr, 16, 4, 4)
+    : Webpage(url, "", proxy_addr, 16, 4, 4),
+      portal_url_(portal_url)
 {
     if (!isLoaded()) {
         return;
@@ -26,7 +28,7 @@ TopicsListWebpage::TopicsListWebpage ( const string& url,
 
     // parse the URLs and titles of all topics on topicslist webpage
     const string& webpage_txt = getTxt();
-    parseTitlesAndUrls(webpage_txt, titles_and_urls_list_);
+    parseTitlesAndUrls(webpage_txt, portal_url_, titles_and_urls_list_);
 
     // unescape html for title
     for (auto& e : titles_and_urls_list_) {
@@ -35,7 +37,7 @@ TopicsListWebpage::TopicsListWebpage ( const string& url,
     }
 
     // parse the next topicslist webpage URL
-    parseNextpageUrl(webpage_txt, nextpage_url_);
+    parseNextpageUrl(webpage_txt, portal_url_, nextpage_url_);
 }
 
 TopicsListWebpage::~TopicsListWebpage ()
@@ -56,3 +58,10 @@ TopicsListWebpage::getTitlesAndUrlsList (void) const
 {
     return(titles_and_urls_list_);
 }
+
+const string&
+TopicsListWebpage::getPortalWebpageUrl (void) const
+{
+    return(portal_url_);
+}
+
